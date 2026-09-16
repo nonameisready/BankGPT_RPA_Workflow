@@ -44,6 +44,9 @@ policy:
     - click
     - extract
     - assert
+  blocked_target_patterns:
+    - open new sub-account
+    - continue to review
   risky_action_behavior: BLOCK
 steps:
   - id: open_member_search
@@ -54,16 +57,17 @@ steps:
     postconditions:
       - kind: element_visible
         target:
+          id: member_id_field
           description: Member ID input
           strategies:
             - kind: label
               value: Member ID
-        operator: exists
   - id: enter_member_id
     description: Enter the caller's fictional member identifier.
     action:
       action: fill
       target:
+        id: member_id_field
         description: Member ID input
         strategies:
           - kind: label
@@ -77,6 +81,7 @@ steps:
     action:
       action: click
       target:
+        id: search_button
         description: Search button
         strategies:
           - kind: role
@@ -93,11 +98,13 @@ steps:
     action:
       action: extract
       target:
+        id: savings_balance
         description: Savings current balance cell
         frame: Member accounts
         strategies:
-          - kind: css
-            value: tr:first-child [data-field="current-balance"]
+          - kind: table_cell
+            row_text: Savings
+            column_header: Current Balance
       output: balance
       transform: currency
   - id: read_currency
@@ -105,33 +112,33 @@ steps:
     action:
       action: extract
       target:
+        id: savings_currency
         description: Savings currency cell
         frame: Member accounts
         strategies:
-          - kind: css
-            value: tr:first-child td:last-child
+          - kind: table_cell
+            row_text: Savings
+            column_header: Currency
       output: currency
       transform: text
 success:
   - kind: output
     output: balance
-    operator: exists
   - kind: output
     output: currency
-    operator: exists
 business_outcomes:
   - code: MEMBER_NOT_FOUND
     description: Search produced a known no-member result.
     checkpoint:
       kind: business_outcome
       target:
+        id: member_not_found_alert
         description: Member not found alert
         strategies:
           - kind: role
             role: alert
-          - kind: css
-            value: '[data-outcome-code="MEMBER_NOT_FOUND"]'
       code: MEMBER_NOT_FOUND
+      expected_text: Member Not Found
 tenant_overrides: []
 metadata:
   created_at: 2026-09-15T00:00:00.000Z

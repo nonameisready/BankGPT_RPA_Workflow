@@ -1,3 +1,3 @@
 # Deterministic replay
 
-The LLM-free replay engine and deterministic locator resolver will live here.
+`ReplayEngine` resolves inputs, authorizes every action, runs bounded explicit retries, checks business outcomes and success checkpoints, and returns a structured result. It has no LLM dependency.

@@ -8,9 +8,11 @@ export const LocatorStrategySchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("name"), value: z.string().min(1) }).strict(),
   z.object({ kind: z.literal("placeholder"), value: z.string().min(1), exact: z.boolean().optional() }).strict(),
   z.object({ kind: z.literal("text_near"), text: z.string().min(1), relation: z.enum(["before", "after", "within"]), selector: z.string().min(1).optional() }).strict(),
+  z.object({ kind: z.literal("table_cell"), row_text: z.string().min(1), column_header: z.string().min(1) }).strict(),
 ]);
 
 export const TargetSchema = z.object({
+  id: z.string().regex(/^[a-z][a-z0-9_-]*$/),
   description: z.string().min(1),
   strategies: z.array(LocatorStrategySchema).min(1),
   frame: z.string().min(1).optional(),

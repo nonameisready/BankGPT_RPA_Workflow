@@ -1,0 +1,185 @@
+schema_version: "1.0"
+id: legacybank.get_savings_balance
+version: 1.0.0
+name: Get Savings Balance
+description: Return a fictional LegacyBank member's savings balance and currency.
+approval: draft
+application:
+  vendor_family: LegacyBank
+  app_family: Admin Simulator
+  compatible_versions:
+    - 7.x
+  variant: training
+  entry_url: http://localhost:4000
+  fingerprint_hints:
+    title: LegacyBank Admin Simulator
+inputs:
+  member_id:
+    type: string
+    description: Invocation input member_id
+    required: true
+    sensitive: false
+outputs:
+  balance:
+    type: number
+    description: Output balance extracted by the capability
+    nullable: false
+    sensitive: false
+  currency:
+    type: string
+    description: Output currency extracted by the capability
+    nullable: false
+    sensitive: false
+risk: SAFE
+policy:
+  allowed_domains:
+    - localhost
+    - 127.0.0.1
+  allowed_route_patterns:
+    - ^/$
+    - ^/members(?:/.*)?$
+  allowed_actions:
+    - navigate
+    - fill
+    - click
+    - wait
+    - extract
+    - assert
+  blocked_target_patterns:
+    - open new sub-account
+    - continue to review
+    - confirm and open
+  risky_action_behavior: BLOCK
+steps:
+  - id: fill_member_id_input
+    description: The member ID input field is visible and ready to be filled with
+      the provided ID {from_input:member_id}.
+    action:
+      reason: The member ID input field is visible and ready to be filled with the
+        provided ID {from_input:member_id}.
+      action: fill
+      target:
+        id: member_id_input
+        description: Member ID input field
+        strategies:
+          - kind: label
+            value: Member ID
+      value:
+        from_input: member_id
+    preconditions: []
+    postconditions: []
+    wait:
+      before_ms: 0
+      after_ms: 0
+    recovery:
+      max_attempts: 1
+      backoff_ms: 0
+      on_failure: fail
+  - id: click_search_button
+    description: Member ID {from_input:member_id} has been entered and the search
+      button is ready to be clicked to retrieve the balance and currency.
+    action:
+      reason: Member ID {from_input:member_id} has been entered and the search button
+        is ready to be clicked to retrieve the balance and currency.
+      action: click
+      target:
+        id: search_button
+        description: Search button to look up member {from_input:member_id}
+        strategies:
+          - kind: role
+            role: button
+            name: Search
+    preconditions: []
+    postconditions: []
+    wait:
+      before_ms: 0
+      after_ms: 0
+    recovery:
+      max_attempts: 2
+      backoff_ms: 300
+      on_failure: fail
+  - id: extract_savings_balance
+    description: The savings balance is visible in the accounts table within the frame.
+    action:
+      reason: The savings balance is visible in the accounts table within the frame.
+      action: extract
+      target:
+        id: savings_balance
+        description: Savings current balance cell
+        strategies:
+          - kind: table_cell
+            row_text: Savings
+            column_header: Current Balance
+        frame: Member accounts
+      output: balance
+      transform: currency
+    preconditions: []
+    postconditions:
+      - timeout_ms: 10000
+        kind: output
+        output: balance
+    wait:
+      before_ms: 0
+      after_ms: 0
+    recovery:
+      max_attempts: 1
+      backoff_ms: 0
+      on_failure: fail
+  - id: extract_savings_currency
+    description: The savings balance has been extracted, and the currency for the
+      same row needs to be extracted to complete the goal.
+    action:
+      reason: The savings balance has been extracted, and the currency for the same
+        row needs to be extracted to complete the goal.
+      action: extract
+      target:
+        id: savings_currency
+        description: Savings currency cell
+        strategies:
+          - kind: table_cell
+            row_text: Savings
+            column_header: Currency
+        frame: Member accounts
+      output: currency
+      transform: text
+    preconditions: []
+    postconditions:
+      - timeout_ms: 10000
+        kind: output
+        output: currency
+    wait:
+      before_ms: 0
+      after_ms: 0
+    recovery:
+      max_attempts: 1
+      backoff_ms: 0
+      on_failure: fail
+success:
+  - timeout_ms: 10000
+    kind: output
+    output: balance
+  - timeout_ms: 10000
+    kind: output
+    output: currency
+business_outcomes:
+  - code: MEMBER_NOT_FOUND
+    description: Member search returned a known no-record result.
+    checkpoint:
+      timeout_ms: 10000
+      kind: business_outcome
+      target:
+        id: member_not_found_alert
+        description: Member not found alert
+        strategies:
+          - kind: role
+            role: alert
+      code: MEMBER_NOT_FOUND
+      expected_text: Member Not Found
+tenant_overrides: []
+metadata:
+  created_at: 2026-09-16T02:18:41.191Z
+  created_by: capability-compiler
+  source_trace_id: 6df58ee4-0ba6-473a-b37d-f129fc59ef04
+  description_notes:
+    - Balance and currency extracted from the Savings account row.
+  contains_secrets: false

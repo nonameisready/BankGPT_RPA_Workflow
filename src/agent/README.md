@@ -1,3 +1,3 @@
 # Discovery agent
 
-The observe → decide → authorize → act loop will live here. This is discovery-plane code.
+`DiscoveryAgent` owns the bounded observe → decide → authorize → act loop, screenshots, JSONL events, and raw `RunTrace` persistence. This is discovery-plane code.

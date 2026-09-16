@@ -1,3 +1,3 @@
 # Evidence
 
-JSONL events, screenshot storage, and evidence redaction will live here.
+`JsonlEvidenceStore` writes per-run JSONL events, copied PNG screenshots, and discovery traces with recursive redaction.

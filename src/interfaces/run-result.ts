@@ -4,10 +4,10 @@ export interface RunResult {
   runId: string;
   status: RunStatus;
   code: string;
-  currentStepId?: string;
+  currentStepId?: string | undefined;
   expectedState?: string;
   observedState?: string;
   outputs: Readonly<Record<string, unknown>>;
   evidence: ReadonlyArray<string>;
-  debugMessage?: string;
+  debugMessage?: string | undefined;
 }

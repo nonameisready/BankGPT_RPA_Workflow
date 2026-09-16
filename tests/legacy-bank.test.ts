@@ -11,11 +11,12 @@ describe("LegacyBank Admin Simulator", () => {
     expect(member.text).toContain('title="Member accounts"');
 
     const accounts = await request(app).get("/members/12345/accounts").expect(200);
-    expect(accounts.text).toContain('data-field="current-balance">$12,340.22');
+    expect(accounts.text).toContain('<td>$12,340.22</td>');
+    expect(accounts.text).not.toContain("data-field");
   });
 
   it.each([
-    ["40400", 404, "MEMBER_NOT_FOUND"],
+    ["40400", 404, "Member Not Found"],
     ["40300", 403, "PERMISSION_DENIED"],
     ["50000", 500, "APP_ERROR"],
   ])("maps member %s to HTTP %s and code %s", async (memberId, status, code) => {

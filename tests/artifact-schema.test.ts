@@ -32,11 +32,11 @@ const artifact = {
     description: "Enter the requested member ID",
     action: {
       action: "fill",
-      target: { description: "Member ID field", strategies: [{ kind: "label", value: "Member ID" }] },
+      target: { id: "member_id_field", description: "Member ID field", strategies: [{ kind: "label", value: "Member ID" }] },
       value: { from_input: "member_id" },
     },
   }],
-  success: [{ kind: "output", output: "balance", operator: "exists" }],
+  success: [{ kind: "output", output: "balance" }],
   metadata: { created_at: "2026-09-15T00:00:00.000Z", created_by: "test", contains_secrets: false },
 };
 
@@ -80,7 +80,22 @@ describe("CapabilityArtifactSchema", () => {
 
   it("rejects ambiguous wait and assert actions", () => {
     expect(SurfaceActionSchema.safeParse({ action: "wait", for: "visible", timeout_ms: 1000 }).success).toBe(false);
-    expect(SurfaceActionSchema.safeParse({ action: "assert", condition: "text_equals", target: { description: "value", strategies: [{ kind: "text", value: "value" }] } }).success).toBe(false);
+    expect(SurfaceActionSchema.safeParse({ action: "assert", condition: "text_equals", target: { id: "value", description: "value", strategies: [{ kind: "text", value: "value" }] } }).success).toBe(false);
     expect(SurfaceActionSchema.safeParse({ action: "navigate", url: 42 }).success).toBe(false);
+  });
+
+  it("rejects checkpoint fields that do not belong to the kind and unsafe recovery", () => {
+    const target = { id: "member_id_field", description: "Member ID field", strategies: [{ kind: "label", value: "Member ID" }] };
+    const invalidCheckpoint = { ...artifact, success: [{ kind: "output", output: "balance", target }] };
+    expect(CapabilityArtifactSchema.safeParse(invalidCheckpoint).success).toBe(false);
+    const unsafeRecovery = { ...artifact, steps: [{ ...artifact.steps[0], recovery: { on_failure: "continue" } }] };
+    expect(CapabilityArtifactSchema.safeParse(unsafeRecovery).success).toBe(false);
+  });
+
+  it("rejects business outcomes with the wrong checkpoint kind or mismatched code", () => {
+    const target = { id: "not_found_alert", description: "Not found alert", strategies: [{ kind: "role", role: "alert" }] };
+    const baseOutcome = { code: "MEMBER_NOT_FOUND", description: "No member", checkpoint: { kind: "business_outcome", target, code: "MEMBER_NOT_FOUND", expected_text: "Member Not Found" } };
+    expect(CapabilityArtifactSchema.safeParse({ ...artifact, business_outcomes: [{ ...baseOutcome, checkpoint: { kind: "output", output: "balance" } }] }).success).toBe(false);
+    expect(CapabilityArtifactSchema.safeParse({ ...artifact, business_outcomes: [{ ...baseOutcome, checkpoint: { ...baseOutcome.checkpoint, code: "OTHER_CODE" } }] }).success).toBe(false);
   });
 });

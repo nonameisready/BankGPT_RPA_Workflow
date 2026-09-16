@@ -24,20 +24,22 @@ export const OutputDefinitionSchema = z.object({
   sensitive: z.boolean().default(false),
 }).strict();
 
-export const CheckpointSchema = z.object({
-  kind: z.enum(["url", "element_visible", "element_hidden", "text", "output", "business_outcome"]),
-  target: TargetSchema.optional(),
-  operator: z.enum(["equals", "contains", "matches", "exists", "not_exists"]).optional(),
-  expected: JsonLiteralSchema.optional(),
-  output: z.string().min(1).optional(),
-  code: z.string().min(1).optional(),
-  timeout_ms: z.number().int().positive().max(60_000).default(10_000),
-}).strict();
+const CheckpointBaseSchema = z.object({ timeout_ms: z.number().int().positive().max(60_000).default(10_000) });
+const BusinessOutcomeCheckpointSchema = CheckpointBaseSchema.extend({ kind: z.literal("business_outcome"), target: TargetSchema, code: z.string().regex(/^[A-Z][A-Z0-9_]*$/), expected_text: z.string().min(1) }).strict();
+
+export const CheckpointSchema = z.discriminatedUnion("kind", [
+  CheckpointBaseSchema.extend({ kind: z.literal("url"), operator: z.enum(["equals", "contains", "matches"]), expected: z.string().min(1) }).strict(),
+  CheckpointBaseSchema.extend({ kind: z.literal("element_visible"), target: TargetSchema }).strict(),
+  CheckpointBaseSchema.extend({ kind: z.literal("element_hidden"), target: TargetSchema }).strict(),
+  CheckpointBaseSchema.extend({ kind: z.literal("text"), target: TargetSchema, operator: z.enum(["equals", "contains", "matches"]), expected: z.string().min(1) }).strict(),
+  CheckpointBaseSchema.extend({ kind: z.literal("output"), output: z.string().min(1) }).strict(),
+  BusinessOutcomeCheckpointSchema,
+]);
 
 export const RecoveryPolicySchema = z.object({
   max_attempts: z.number().int().min(1).max(5).default(1),
   backoff_ms: z.number().int().min(0).max(30_000).default(0),
-  on_failure: z.enum(["fail", "request_human", "continue"]).default("fail"),
+  on_failure: z.enum(["fail", "request_human"]).default("fail"),
   known_interstitial: z.object({ dismiss_target: TargetSchema }).strict().optional(),
 }).strict();
 
@@ -54,8 +56,12 @@ export const CapabilityStepSchema = z.object({
 export const BusinessOutcomeSchema = z.object({
   code: z.string().regex(/^[A-Z][A-Z0-9_]*$/),
   description: z.string().min(1),
-  checkpoint: CheckpointSchema,
-}).strict();
+  checkpoint: BusinessOutcomeCheckpointSchema,
+}).strict().superRefine((outcome, context) => {
+  if (outcome.code !== outcome.checkpoint.code) {
+    context.addIssue({ code: "custom", path: ["checkpoint", "code"], message: "Business outcome code must match checkpoint code" });
+  }
+});
 
 export const TenantOverrideSchema = z.object({
   tenant: z.string().min(1),
@@ -85,6 +91,7 @@ export const CapabilityArtifactSchema = z.object({
     allowed_domains: z.array(z.string().min(1)).min(1),
     allowed_route_patterns: z.array(z.string().min(1)).default([]),
     allowed_actions: z.array(ActionTypeSchema).min(1),
+    blocked_target_patterns: z.array(z.string().min(1)).default([]),
     risky_action_behavior: z.enum(["BLOCK", "REQUIRE_HUMAN", "REQUIRE_EXPLICIT_APPROVAL"]).default("BLOCK"),
   }).strict(),
   steps: z.array(CapabilityStepSchema).min(1),
@@ -119,8 +126,26 @@ export const CapabilityArtifactSchema = z.object({
     }
   }
   for (const [index, checkpoint] of artifact.success.entries()) {
-    if (checkpoint.kind === "output" && (!checkpoint.output || !Object.hasOwn(artifact.outputs, checkpoint.output))) {
+    if (checkpoint.kind === "output" && !Object.hasOwn(artifact.outputs, checkpoint.output)) {
       context.addIssue({ code: "custom", path: ["success", index, "output"], message: "Success output checkpoint must name a declared output" });
+    }
+  }
+  const reusableTargets = new Map<string, string>();
+  const collectTarget = (target: { id: string; description: string } | undefined) => {
+    if (!target) return;
+    const existing = reusableTargets.get(target.id);
+    if (existing && existing !== target.description) context.addIssue({ code: "custom", message: `Target id ${target.id} has inconsistent descriptions` });
+    reusableTargets.set(target.id, target.description);
+  };
+  for (const step of artifact.steps) {
+    if ("target" in step.action) collectTarget(step.action.target);
+    for (const checkpoint of [...step.preconditions, ...step.postconditions]) if ("target" in checkpoint) collectTarget(checkpoint.target);
+  }
+  for (const checkpoint of artifact.success) if ("target" in checkpoint) collectTarget(checkpoint.target);
+  for (const outcome of artifact.business_outcomes) if ("target" in outcome.checkpoint) collectTarget(outcome.checkpoint.target);
+  for (const [index, override] of artifact.tenant_overrides.entries()) {
+    for (const [targetId, target] of Object.entries(override.locator_overrides)) {
+      if (!reusableTargets.has(targetId) || target.id !== targetId) context.addIssue({ code: "custom", path: ["tenant_overrides", index, "locator_overrides", targetId], message: `Override must address a known target id: ${targetId}` });
     }
   }
 });

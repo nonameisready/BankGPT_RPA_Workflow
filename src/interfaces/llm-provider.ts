@@ -8,11 +8,13 @@ export interface AgentDecisionInput {
   history: ReadonlyArray<{ action: SurfaceAction; result: ActionResultSummary }>;
   observation: Observation;
   policySummary: string;
+  requiredOutputs?: ReadonlyArray<string> | undefined;
 }
 
 export interface ActionResultSummary {
   success: boolean;
-  message?: string;
+  message?: string | undefined;
+  extractedValue?: unknown;
 }
 
 export interface AgentDecision {

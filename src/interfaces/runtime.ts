@@ -3,6 +3,7 @@ import type { EvidenceStore } from "./evidence-store.js";
 import type { PolicyEngine } from "./policy-engine.js";
 import type { RunResult } from "./run-result.js";
 import type { SurfaceAdapter } from "./surface-adapter.js";
+import type { RunTrace } from "./run-trace.js";
 
 export interface DiscoveryRequest {
   goal: string;
@@ -10,10 +11,11 @@ export interface DiscoveryRequest {
   inputs?: Readonly<Record<string, unknown>>;
   maxSteps: number;
   timeoutMs: number;
+  requiredOutputs?: ReadonlyArray<string>;
 }
 
 export interface DiscoveryAgent {
-  discover(request: DiscoveryRequest): Promise<{ traceId: string; result: RunResult }>;
+  discover(request: DiscoveryRequest): Promise<{ trace: RunTrace; result: RunResult }>;
 }
 
 export interface ReplayRequest {

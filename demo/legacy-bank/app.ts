@@ -86,13 +86,13 @@ export function createLegacyBankApp() {
         return;
       }
       case "40400":
-        response.status(404).send(page("Member Not Found", searchForm(`<div class="notice warning" role="alert" data-outcome-code="MEMBER_NOT_FOUND">No member was found for ID 40400.</div>`)));
+        response.status(404).send(page("Member Not Found", searchForm(`<div class="notice warning" role="alert">Member Not Found: No member was found for ID 40400.</div>`)));
         return;
       case "40300":
-        response.status(403).send(page("Permission Denied", `<h1>Permission Denied</h1><div class="notice error" role="alert" data-error-code="PERMISSION_DENIED">Your operator profile cannot access this member.</div><p><a href="/">Return to Member Search</a></p>`));
+        response.status(403).send(page("Permission Denied", `<h1>Permission Denied</h1><div class="notice error" role="alert">PERMISSION_DENIED: Your operator profile cannot access this member.</div><p><a href="/">Return to Member Search</a></p>`));
         return;
       case "50000":
-        response.status(500).send(page("Application Error", `<h1>Application Error</h1><div class="notice error" role="alert" data-error-code="APP_ERROR">The legacy host returned an application error.</div><p>Reference: DEMO-50000</p>`));
+        response.status(500).send(page("Application Error", `<h1>Application Error</h1><div class="notice error" role="alert">APP_ERROR: The legacy host returned an application error.</div><p>Reference: DEMO-50000</p>`));
         return;
       default:
         response.status(400).send(page("Invalid Search", searchForm(`<div class="notice warning" role="alert">Enter a recognized demo Member ID.</div>`)));
@@ -105,7 +105,7 @@ export function createLegacyBankApp() {
       response.status(404).send("Account record not found");
       return;
     }
-    response.send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="/assets/legacy.css"></head><body class="frame-body"><table class="accounts"><thead><tr><th>Type</th><th>Account Number</th><th>Current Balance</th><th>Currency</th></tr></thead><tbody><tr><td>Savings</td><td>${member.savingsAccount}</td><td data-field="current-balance">${member.balance}</td><td>USD</td></tr><tr><td>Checking</td><td>CHK-000124</td><td>$842.17</td><td>USD</td></tr></tbody></table></body></html>`);
+    response.send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="/assets/legacy.css"></head><body class="frame-body"><table class="accounts"><thead><tr><th>Type</th><th>Account Number</th><th>Current Balance</th><th>Currency</th></tr></thead><tbody><tr><td>Savings</td><td>${member.savingsAccount}</td><td>${member.balance}</td><td>USD</td></tr><tr><td>Checking</td><td>CHK-000124</td><td>$842.17</td><td>USD</td></tr></tbody></table></body></html>`);
   });
 
   app.get("/members/:memberId/sub-account/new", (request, response) => {
