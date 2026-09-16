@@ -1,0 +1,30 @@
+{
+  "name": "computer-use-capability-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A typed runtime for discovering and deterministically replaying computer-use capabilities.",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx demo/legacy-bank/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.1",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^5.0.1"
+  }
+}

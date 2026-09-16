@@ -1,0 +1,141 @@
+# Draft schema example only. Discovery/compiler/replay are not implemented in round one.
+schema_version: "1.0"
+id: legacybank.get_savings_balance
+version: 1.0.0
+name: Get Savings Balance
+description: Return a fictional member's current savings balance.
+approval: draft
+application:
+  vendor_family: LegacyBank
+  app_family: Admin Simulator
+  compatible_versions:
+    - "7.x"
+  variant: training
+  entry_url: http://localhost:4000
+  fingerprint_hints:
+    title: LegacyBank Admin Simulator
+inputs:
+  member_id:
+    type: string
+    description: Fictional Member ID supplied at invocation time.
+    required: true
+    sensitive: false
+outputs:
+  balance:
+    type: number
+    description: Current savings balance in dollars.
+    nullable: false
+    sensitive: false
+  currency:
+    type: string
+    description: ISO currency code.
+    nullable: false
+    sensitive: false
+risk: SAFE
+policy:
+  allowed_domains:
+    - localhost
+  allowed_route_patterns:
+    - ^/$
+    - ^/members/.*$
+  allowed_actions:
+    - navigate
+    - fill
+    - click
+    - extract
+    - assert
+  risky_action_behavior: BLOCK
+steps:
+  - id: open_member_search
+    description: Open the training member search page.
+    action:
+      action: navigate
+      url: http://localhost:4000
+    postconditions:
+      - kind: element_visible
+        target:
+          description: Member ID input
+          strategies:
+            - kind: label
+              value: Member ID
+        operator: exists
+  - id: enter_member_id
+    description: Enter the caller's fictional member identifier.
+    action:
+      action: fill
+      target:
+        description: Member ID input
+        strategies:
+          - kind: label
+            value: Member ID
+          - kind: name
+            value: member_id
+      value:
+        from_input: member_id
+  - id: search_member
+    description: Submit the search form.
+    action:
+      action: click
+      target:
+        description: Search button
+        strategies:
+          - kind: role
+            role: button
+            name: Search
+          - kind: css
+            value: button[type="submit"]
+    recovery:
+      max_attempts: 2
+      backoff_ms: 500
+      on_failure: fail
+  - id: read_balance
+    description: Read the savings balance inside the accounts frame.
+    action:
+      action: extract
+      target:
+        description: Savings current balance cell
+        frame: Member accounts
+        strategies:
+          - kind: css
+            value: tr:first-child [data-field="current-balance"]
+      output: balance
+      transform: currency
+  - id: read_currency
+    description: Read the savings account currency.
+    action:
+      action: extract
+      target:
+        description: Savings currency cell
+        frame: Member accounts
+        strategies:
+          - kind: css
+            value: tr:first-child td:last-child
+      output: currency
+      transform: text
+success:
+  - kind: output
+    output: balance
+    operator: exists
+  - kind: output
+    output: currency
+    operator: exists
+business_outcomes:
+  - code: MEMBER_NOT_FOUND
+    description: Search produced a known no-member result.
+    checkpoint:
+      kind: business_outcome
+      target:
+        description: Member not found alert
+        strategies:
+          - kind: role
+            role: alert
+          - kind: css
+            value: '[data-outcome-code="MEMBER_NOT_FOUND"]'
+      code: MEMBER_NOT_FOUND
+tenant_overrides: []
+metadata:
+  created_at: 2026-09-15T00:00:00.000Z
+  created_by: round-one-example
+  description_notes:
+    - Illustrates the schema; it has not been compiled or replayed.
+  contains_secrets: false

@@ -1,0 +1,31 @@
+:root { font-family: Verdana, Arial, sans-serif; color: #111; background: #c7c7c7; }
+body { margin: 0; font-size: 13px; }
+.shell { width: 920px; margin: 18px auto; border: 2px outset #ddd; border-collapse: separate; background: #eee; }
+.masthead { padding: 13px 18px; color: white; background: #173d70; font-size: 20px; font-weight: bold; }
+.masthead span { color: #ffd65a; }
+.masthead small { float: right; margin-top: 6px; font-size: 10px; }
+.nav { padding: 6px 12px; color: white; background: #526f94; }
+.nav a { color: white; }
+.content { min-height: 420px; padding: 18px; vertical-align: top; background: white; }
+.footer { padding: 6px 12px; text-align: center; color: #555; background: #ddd; font-size: 10px; }
+h1 { margin: 0 0 16px; color: #173d70; font-size: 19px; border-bottom: 1px solid #999; }
+h2 { color: #173d70; font-size: 16px; }
+fieldset { border: 1px solid #777; background: #f5f5ed; }
+legend { color: #173d70; font-weight: bold; }
+input, select, button { font: inherit; }
+button, .button-link { padding: 3px 10px; border: 2px outset #ddd; color: #111; background: #ddd; text-decoration: none; }
+.form-table td { padding: 8px; }
+.details, .accounts { width: 100%; border-collapse: collapse; }
+.details caption { padding: 4px; text-align: left; color: white; background: #526f94; font-weight: bold; }
+.details th, .details td, .accounts th, .accounts td { padding: 6px; border: 1px solid #aaa; text-align: left; }
+.details th, .accounts th { background: #e5e5d8; }
+iframe { width: 100%; height: 130px; border: 1px inset #aaa; }
+.frame-body { background: white; padding: 4px; }
+.notice { margin: 10px 0; padding: 9px; border: 1px solid; }
+.success { color: #164c25; background: #e3f4e5; }
+.warning { color: #644b00; background: #fff1b8; }
+.error { color: #721c24; background: #f8d7da; }
+.hint { color: #666; font-size: 11px; }
+.modal-backdrop { position: fixed; inset: 0; display: grid; place-items: center; background: rgb(0 0 0 / 55%); }
+.modal { width: 410px; padding: 18px; border: 4px double #222; background: white; box-shadow: 5px 5px 0 #222; }
+.modal h2 { margin-top: 0; }
