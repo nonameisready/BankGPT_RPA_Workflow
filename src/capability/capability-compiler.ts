@@ -2,8 +2,9 @@ import type { SurfaceAction, Target } from "../actions/action-schema.js";
 import { CapabilityArtifactSchema, type CapabilityArtifact, type CapabilityStep } from "./artifact-schema.js";
 import type { CapabilityCompiler as CompilerInterface, CompilationHints } from "../interfaces/capability-compiler.js";
 import type { RunTrace } from "../interfaces/run-trace.js";
+import type { Observation } from "../interfaces/surface-adapter.js";
 
-function parameterize(action: SurfaceAction, trace: RunTrace, hints: CompilationHints): SurfaceAction {
+function parameterize(action: SurfaceAction, observation: Observation, trace: RunTrace, hints: CompilationHints): SurfaceAction {
   const copy: Record<string, unknown> = { ...action };
   for (const field of ["url", "value", "path", "expected"]) {
     if (!(field in copy)) continue;
@@ -19,7 +20,12 @@ function parameterize(action: SurfaceAction, trace: RunTrace, hints: Compilation
   }
   if ("target" in action && copy.target && typeof copy.target === "object") {
     const target = copy.target as Target;
-    copy.target = { ...target, description: scrubInputValues(target.description, trace, hints) };
+    const strategies = target.strategies.map((strategy) => {
+      if (strategy.kind !== "role" || strategy.name) return strategy;
+      const matches = observation.controls.filter((control) => (control.role ?? control.kind) === strategy.role && control.name?.trim());
+      return matches.length === 1 ? { ...strategy, name: matches[0]!.name!.trim() } : strategy;
+    });
+    copy.target = { ...target, description: scrubInputValues(target.description, trace, hints), strategies };
   }
   if (typeof action.reason === "string") copy.reason = scrubInputValues(action.reason, trace, hints);
   return copy as SurfaceAction;
@@ -47,7 +53,7 @@ export class CapabilityCompiler implements CompilerInterface {
     if (!reusable.length) throw new Error("No reusable successful steps in trace");
     const seenIds = new Map<string, number>();
     const steps: CapabilityStep[] = reusable.map((traceStep, index) => {
-      const action = parameterize(traceStep.action, trace, hints);
+      const action = parameterize(traceStep.action, traceStep.observation, trace, hints);
       const baseId = stepId(action, index);
       const occurrence = (seenIds.get(baseId) ?? 0) + 1;
       seenIds.set(baseId, occurrence);

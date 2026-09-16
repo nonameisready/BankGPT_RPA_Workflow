@@ -25,5 +25,6 @@ export const AgentDecisionSchema = z.object({ action: SurfaceActionSchema }).str
 
 /** Discovery-plane dependency. Never pass this interface to ReplayEngine. */
 export interface LLMProvider {
+  readonly evidenceMetadata: { provider: string; model?: string | undefined };
   decide(input: AgentDecisionInput): Promise<AgentDecision>;
 }

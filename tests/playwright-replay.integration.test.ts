@@ -41,7 +41,7 @@ describe("real LegacyBank browser replay", () => {
     await rm(evidenceRoot, { recursive: true, force: true });
   });
 
-  async function replay(memberId: string, sessionControl?: LiveSessionControlManager, surface = new PlaywrightSurfaceAdapter("chrome")) {
+  async function replay(memberId: string, sessionControl?: LiveSessionControlManager, surface = new PlaywrightSurfaceAdapter()) {
     const evidence = new JsonlEvidenceStore(evidenceRoot);
     const result = await new ReplayEngine().run({
       artifact, inputs: { member_id: memberId }, surface,
@@ -77,7 +77,7 @@ describe("real LegacyBank browser replay", () => {
   }, 60_000);
 
   it("pauses and resumes the same real Playwright browser session after operator action", async () => {
-    const surface = new PlaywrightSurfaceAdapter("chrome");
+    const surface = new PlaywrightSurfaceAdapter();
     const sessionId = surface.getSessionId();
     const manager = new LiveSessionControlManager(async (intervention) => {
       expect(manager.owner(sessionId)).toBe("human");

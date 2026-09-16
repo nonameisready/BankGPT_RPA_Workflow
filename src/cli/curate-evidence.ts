@@ -27,7 +27,7 @@ function rewriteReferences(value: unknown, originalDirectory: string, curatedDir
 }
 
 function verifySanitized(text: string, path: string): void {
-  const forbidden = [/\/Users\//i, /\/private\/tmp\//i, /Qwen3\.5-35B-A3B-4bit/i, /(?:api[_-]?key|authorization|cookie|storage[_-]?state|password|credential)\s*[":=]\s*(?!\[REDACTED\])/i, /Bearer\s+(?:local|sk-[A-Za-z0-9]+)/i];
+  const forbidden = [/\/Users\//i, /\/private\/tmp\//i, /(?:api[_-]?key|authorization|cookie|storage[_-]?state|password|credential)\s*[":=]\s*(?!\[REDACTED\])/i, /Bearer\s+(?:local|sk-[A-Za-z0-9]+)/i];
   if (forbidden.some((pattern) => pattern.test(text))) throw new Error(`Potential secret or absolute path in curated evidence: ${path}`);
 }
 
@@ -40,14 +40,23 @@ async function curate(category: Category): Promise<string> {
   await cp(originalDirectory, curatedDirectory, { recursive: true, force: true, errorOnExist: false });
   const eventsPath = join(curatedDirectory, "events.jsonl");
   const sourceEvents = await readFile(eventsPath, "utf8");
-  const parsedEvents: Array<{ runId?: string; event?: string; payload?: { status?: string; code?: string } }> = [];
+  const parsedEvents: Array<{ runId?: string; stepId?: string; event?: string; payload?: Record<string, unknown> }> = [];
   for (const line of sourceEvents.trim().split("\n")) {
-    const event = JSON.parse(line) as { runId?: string; event?: string; payload?: { status?: string; code?: string } };
+    const event = JSON.parse(line) as { runId?: string; stepId?: string; event?: string; payload?: Record<string, unknown> };
     if (event.runId !== runId) throw new Error(`Mismatched run ID in ${eventsPath}`);
     parsedEvents.push(event);
   }
   const expectedEvent = category === "discovery" ? "finish" : category === "handoff" || category === "replay-success" ? "success" : "terminal_condition";
   if (!parsedEvents.some((event) => event.event === expectedEvent)) throw new Error(`Selected run lacks ${expectedEvent}: ${runId}`);
+  if (category === "discovery") {
+    const decisions = parsedEvents.map((event, index) => ({ event, index })).filter(({ event }) => event.event === "llm_decision");
+    if (!decisions.length) throw new Error(`Selected discovery lacks LLM decisions: ${runId}`);
+    for (const { event, index } of decisions) {
+      const observed = parsedEvents.slice(0, index).some((candidate) => candidate.stepId === event.stepId && candidate.event === "observation");
+      const authorizedOrFinished = parsedEvents.slice(index + 1).some((candidate) => candidate.stepId === event.stepId && (candidate.event === "action" || candidate.event === "finish"));
+      if (!observed || !authorizedOrFinished || event.payload?.schema_valid !== true || typeof event.payload?.provider !== "string") throw new Error(`Incomplete model-driven event sequence at ${event.stepId}`);
+    }
+  }
   if (category === "handoff" && !["intervention_request", "session_paused", "human_takeover", "automation_resumed"].every((name) => parsedEvents.some((event) => event.event === name))) throw new Error(`Selected handoff run lacks ownership evidence: ${runId}`);
   if (category === "replay-business-outcome" && !parsedEvents.some((event) => event.payload?.status === "BUSINESS_OUTCOME")) throw new Error(`Selected run is not a business outcome: ${runId}`);
   if (category.startsWith("replay-hard-failure") && !parsedEvents.some((event) => event.payload?.status === "HARD_FAILURE")) throw new Error(`Selected run is not a hard failure: ${runId}`);

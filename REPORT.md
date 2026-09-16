@@ -1,6 +1,6 @@
 # 1. Architecture
 
-The discovery plane runs observe → OpenAI-compatible model decision → Zod validation → policy check → Playwright action. Its output is a raw `RunTrace`. The execution plane accepts a reviewed `CapabilityArtifact` and typed invocation inputs, then runs through `ReplayEngine` with no `LLMProvider` dependency. Both planes use the same `SurfaceAdapter`, `PolicyEngine`, and JSONL evidence interface. The local LegacyBank simulator is a proxy for API-less browser applications, not a production bank.
+The discovery plane runs observe → OpenAI-compatible model decision → Zod validation → policy check → Playwright action. Its output is a raw `RunTrace`. The execution plane accepts a validated `CapabilityArtifact` and typed invocation inputs, then runs through `ReplayEngine` with no `LLMProvider` dependency. Draft replay is allowed in this development demo; a production capability catalog would gate execution by approval state. Both planes use the same `SurfaceAdapter`, `PolicyEngine`, and JSONL evidence interface. The local LegacyBank simulator is a proxy for API-less browser applications, not a production bank.
 
 # 2. Artifact schema
 

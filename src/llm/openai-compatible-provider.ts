@@ -5,6 +5,11 @@ const CompletionResponseSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string().nullable() }).passthrough() }).passthrough()).min(1),
 }).passthrough();
 
+function safeModelLabel(model: string): string {
+  const label = model.replaceAll("\\", "/").split("/").filter(Boolean).at(-1) ?? "configured-model";
+  return label.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120) || "configured-model";
+}
+
 export interface OpenAICompatibleConfig {
   baseUrl: string;
   model: string;
@@ -58,10 +63,13 @@ function normalizeDecision(raw: unknown, requiredOutputs: ReadonlyArray<string> 
 }
 
 export class OpenAICompatibleProvider implements LLMProvider {
+  readonly evidenceMetadata: { provider: string; model: string };
+
   constructor(private readonly config: OpenAICompatibleConfig) {
     if (!config.baseUrl || !config.model) throw new Error("LLM base URL and model are required");
     const host = new URL(config.baseUrl).hostname;
     if (!config.apiKey && !["localhost", "127.0.0.1"].includes(host)) throw new Error("API key required for non-local LLM endpoint");
+    this.evidenceMetadata = { provider: "openai-compatible", model: safeModelLabel(config.model) };
   }
 
   static fromEnvironment(environment: NodeJS.ProcessEnv = process.env): OpenAICompatibleProvider {

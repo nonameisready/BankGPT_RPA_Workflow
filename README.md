@@ -25,7 +25,7 @@ flowchart LR
 
 ## Setup
 
-Use Node 20+ and install dependencies. Playwright can use its own Chromium (`npx playwright install chromium`) or an existing Google Chrome (`PLAYWRIGHT_CHANNEL=chrome`). The latter is what was used for the local verified runs.
+Use Node 20+ and install dependencies. Tests and runtime use Playwright-managed Chromium by default. Set `PLAYWRIGHT_CHANNEL=chrome` only when explicitly choosing an installed Google Chrome channel.
 
 ```bash
 npm install
@@ -40,6 +40,8 @@ QWEN_BASE_URL=http://127.0.0.1:8080/v1
 QWEN_MODEL=/absolute/path/to/your/qwen-model-id
 PLAYWRIGHT_CHANNEL=chrome
 ```
+
+Omit `PLAYWRIGHT_CHANNEL` to use bundled Chromium. Draft replay is allowed in this development demo; a production capability catalog would gate execution by approval state.
 
 The provider sends the compatibility key `local` automatically for a Qwen endpoint. For OpenAI or another compatible cloud endpoint, set `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL` instead. If a compatible server does not support JSON response mode, set `OPENAI_JSON_MODE=false`; every response is still Zod-validated. The provider uses the documented [Chat Completions endpoint](https://developers.openai.com/api/reference/cli/resources/chat/subresources/completions).
 
@@ -103,7 +105,7 @@ All names and account data are fictional.
 
 ## Discovery, artifact, and replay
 
-`PlaywrightSurfaceAdapter` observes visible text, controls, dialogs, and iframe summaries; the model chooses one validated action at a time. Policy authorizes before execution. Each step creates JSONL events and PNG observations. The `RunTrace` retains raw discovery evidence and is not the reusable artifact.
+`PlaywrightSurfaceAdapter` observes visible text, controls, dialogs, and iframe summaries; the model chooses one validated action at a time. Discovery records sanitized observation metadata, a schema-valid model decision with provider/model label and latency, then the policy-authorized action. It never records raw prompts, raw model responses, chain of thought, keys, or provider URLs. Each step also creates PNG evidence. The `RunTrace` retains raw discovery execution evidence and is not the reusable artifact.
 
 `CapabilityCompiler` accepts a successful trace plus explicit demo hints for input/output names, output table cells, and declared terminal conditions. It keeps successful actions, substitutes `{from_input: member_id}`, removes the observed invocation value from reusable descriptions, and writes a draft schema-versioned artifact. The [schema example](capabilities/get-savings-balance.example.yaml) shows target IDs, ordered semantic locator strategies, bounded recovery, output checkpoints, and classified terminal conditions. Generated artifacts live under `capabilities/generated/` for human review.
 

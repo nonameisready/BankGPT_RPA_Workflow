@@ -11,6 +11,7 @@ import { ConfigurablePolicyEngine, policyFromArtifact } from "../src/policy/conf
 import { redact } from "../src/policy/redaction.js";
 import { ReplayEngine } from "../src/replay/replay-engine.js";
 import { LiveSessionControlManager } from "../src/handoff/live-session-control-manager.js";
+import { OpenAICompatibleProvider } from "../src/llm/openai-compatible-provider.js";
 import { resolveLocator } from "../src/surface/locator-resolver.js";
 
 const example = parseArtifact(readFileSync(new URL("../capabilities/get-savings-balance.example.yaml", import.meta.url), "utf8"), "yaml");
@@ -58,6 +59,12 @@ class MockSurface implements SurfaceAdapter {
 }
 
 describe("deterministic runtime", () => {
+  it("exposes only a safe model label for discovery evidence", () => {
+    const provider = new OpenAICompatibleProvider({ baseUrl: "http://127.0.0.1:8080/v1", model: "/Users/example/models/Qwen3.5-35B-A3B-4bit", apiKey: "local" });
+    expect(provider.evidenceMetadata).toEqual({ provider: "openai-compatible", model: "Qwen3.5-35B-A3B-4bit" });
+    expect(JSON.stringify(provider.evidenceMetadata)).not.toContain("/Users/");
+  });
+
   it("interpolates input references and rejects missing values", () => {
     const action = example.steps.find((step) => step.action.action === "fill")?.action;
     expect(action).toBeDefined();

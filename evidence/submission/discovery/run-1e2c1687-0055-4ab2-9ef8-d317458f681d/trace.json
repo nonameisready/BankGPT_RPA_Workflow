@@ -1,5 +1,5 @@
 {
-  "traceId": "3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+  "traceId": "1e2c1687-0055-4ab2-9ef8-d317458f681d",
   "goal": "Look up member 12345 and return the current savings balance and currency",
   "inputs": {
     "member_id": "12345"
@@ -10,7 +10,7 @@
       "observation": {
         "url": "http://localhost:4000/",
         "title": "Member Search | LegacyBank Admin Simulator",
-        "visibleText": "LegacyBank Admin Simulator\nTRAINING SYSTEM — FAKE DATA ONLY\n\nMember Search | Help | Operator: demo.user\n\nMember Search\nSearch Criteria\nMember ID\t\tSearch\n\nAuthorized training use only. Try member ID 12345.\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4",
+        "visibleText": "LegacyBank Admin Simulator TRAINING SYSTEM — FAKE DATA ONLY\nMember Search | Help | Operator: demo.user\n\nMember Search\nSearch Criteria\nMember ID\t\tSearch\n\nAuthorized training use only. Try member ID 12345.\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4",
         "controls": [
           {
             "kind": "link",
@@ -36,14 +36,14 @@
         ],
         "dialogs": [],
         "frames": [],
-        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png"
+        "screenshotPath": "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533159241-observe-1.png"
       },
       "action": {
-        "reason": "The member ID input field is visible and ready to be filled with the provided ID 12345.",
+        "reason": "The member ID input field is visible and ready to be filled with the provided ID 12345 to perform the search.",
         "action": "fill",
         "target": {
-          "id": "member_id_field",
-          "description": "Member ID field",
+          "id": "member_id_input",
+          "description": "Member ID input field",
           "strategies": [
             {
               "kind": "label",
@@ -57,15 +57,15 @@
       },
       "result": {
         "success": true,
-        "durationMs": 15,
+        "durationMs": 22,
         "resolution": {
-          "targetId": "member_id_field",
+          "targetId": "member_id_input",
           "strategyIndex": 0,
           "strategyKind": "label"
         }
       },
       "evidence": [
-        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png"
+        "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533159241-observe-1.png"
       ]
     },
     {
@@ -99,7 +99,7 @@
         ],
         "dialogs": [],
         "frames": [],
-        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png"
+        "screenshotPath": "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533219292-observe-2.png"
       },
       "action": {
         "reason": "The member ID 12345 has been entered and the search button is now ready to be clicked to retrieve the member's savings balance and currency.",
@@ -110,14 +110,15 @@
           "strategies": [
             {
               "kind": "role",
-              "role": "button"
+              "role": "button",
+              "name": "Search"
             }
           ]
         }
       },
       "result": {
         "success": true,
-        "durationMs": 60,
+        "durationMs": 45,
         "resolution": {
           "targetId": "search_button",
           "strategyIndex": 0,
@@ -125,7 +126,7 @@
         }
       },
       "evidence": [
-        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png"
+        "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533219292-observe-2.png"
       ]
     },
     {
@@ -155,14 +156,13 @@
             "url": "http://localhost:4000/members/12345/accounts"
           }
         ],
-        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png"
+        "screenshotPath": "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533222433-observe-3.png"
       },
       "action": {
-        "reason": "The savings balance is visible in the accounts table within the frame and needs to be extracted.",
         "action": "extract",
         "target": {
-          "id": "savings_balance",
-          "description": "Savings account current balance",
+          "id": "savings_balance_currency",
+          "description": "Savings account balance and currency from the accounts table",
           "strategies": [
             {
               "kind": "table_cell",
@@ -177,16 +177,16 @@
       },
       "result": {
         "success": true,
-        "durationMs": 42,
+        "durationMs": 41,
         "extractedValue": 12340.22,
         "resolution": {
-          "targetId": "savings_balance",
+          "targetId": "savings_balance_currency",
           "strategyIndex": 0,
           "strategyKind": "table_cell"
         }
       },
       "evidence": [
-        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png"
+        "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533222433-observe-3.png"
       ]
     },
     {
@@ -216,14 +216,14 @@
             "url": "http://localhost:4000/members/12345/accounts"
           }
         ],
-        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png"
+        "screenshotPath": "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533225485-observe-4.png"
       },
       "action": {
-        "reason": "The savings balance has been extracted; now extract the currency from the same row in the accounts table.",
+        "reason": "The balance has been extracted; now extract the currency from the same row in the accounts table to complete the required outputs.",
         "action": "extract",
         "target": {
           "id": "savings_currency",
-          "description": "Savings account currency",
+          "description": "Savings account currency from the accounts table",
           "strategies": [
             {
               "kind": "table_cell",
@@ -238,7 +238,7 @@
       },
       "result": {
         "success": true,
-        "durationMs": 23,
+        "durationMs": 21,
         "extractedValue": "USD",
         "resolution": {
           "targetId": "savings_currency",
@@ -247,12 +247,12 @@
         }
       },
       "evidence": [
-        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png"
+        "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533225485-observe-4.png"
       ]
     }
   ],
   "result": {
-    "runId": "3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+    "runId": "1e2c1687-0055-4ab2-9ef8-d317458f681d",
     "status": "SUCCESS",
     "code": "BALANCE_CURRENCY_RETRIEVED",
     "currentStepId": "discover_5",
@@ -261,14 +261,14 @@
       "currency": "USD"
     },
     "evidence": [
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/events.jsonl",
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png",
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png",
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png",
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png",
-      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527524077-observe-5.png"
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/events.jsonl",
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533159241-observe-1.png",
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533219292-observe-2.png",
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533222433-observe-3.png",
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533225485-observe-4.png",
+      "evidence/submission/discovery/run-1e2c1687-0055-4ab2-9ef8-d317458f681d/screenshots/1789533229203-observe-5.png"
     ]
   },
-  "startedAt": "2026-09-16T02:57:44.437Z",
-  "finishedAt": "2026-09-16T02:58:47.158Z"
+  "startedAt": "2026-09-16T04:32:39.098Z",
+  "finishedAt": "2026-09-16T04:33:52.244Z"
 }

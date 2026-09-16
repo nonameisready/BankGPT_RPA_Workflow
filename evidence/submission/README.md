@@ -4,7 +4,7 @@ This directory contains sanitized evidence from actual fake-data runs against th
 
 | Scenario | Run ID | Verified result |
 |---|---|---|
-| Discovery | `3be3dcd3-9f70-4f57-8d09-76fa7220c88f` | `SUCCESS`, balance `12340.22`, currency `USD` |
+| Discovery | `1e2c1687-0055-4ab2-9ef8-d317458f681d` | `SUCCESS`, balance `12340.22`, currency `USD`; sanitized model decisions recorded |
 | Replay success | `e7eae7f6-b8fe-42f6-9288-cf0cdd68b32c` | `SUCCESS`, balance `12340.22`, currency `USD` |
 | Missing member | `5f1b04f1-0904-4c42-ba53-e6755a338788` | `BUSINESS_OUTCOME/MEMBER_NOT_FOUND` |
 | Permission failure | `dc52ed74-7f7a-4af1-b5db-47078120c27e` | `HARD_FAILURE/PERMISSION_DENIED` |

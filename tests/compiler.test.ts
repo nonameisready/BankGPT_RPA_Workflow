@@ -13,7 +13,7 @@ const trace: RunTrace = {
 const hints: CompilationHints = {
   capabilityId: "legacybank.get_savings_balance", name: "Get Savings Balance", description: "Read a fake balance", inputNames: ["member_id"], outputNames: ["balance", "currency"], goalCompletion: "Outputs extracted",
   application: { vendor_family: "LegacyBank", app_family: "Simulator", compatible_versions: ["7.x"], entry_url: "http://localhost:4000", fingerprint_hints: {} },
-  policy: { allowed_domains: ["localhost"], allowed_route_patterns: ["^/$"], allowed_actions: ["fill"], blocked_target_patterns: [], risky_action_behavior: "BLOCK" }, risk: "SAFE",
+  policy: { allowed_domains: ["localhost"], allowed_route_patterns: ["^/$"], allowed_actions: ["fill", "click"], blocked_target_patterns: [], risky_action_behavior: "BLOCK" }, risk: "SAFE",
 };
 
 describe("CapabilityCompiler", () => {
@@ -27,5 +27,14 @@ describe("CapabilityCompiler", () => {
   it("rejects a failed trace", async () => {
     const failed: RunTrace = { ...trace, result: { ...trace.result, status: "HARD_FAILURE" } };
     await expect(new CapabilityCompiler().compile(failed, hints)).rejects.toThrow(/Only successful/);
+  });
+
+  it("adds a unique observed accessible name to a generic role target", async () => {
+    const buttonTrace: RunTrace = {
+      ...trace,
+      steps: [{ id: "step_1", observation: { ...observation, controls: [{ kind: "button", name: "Search" }] }, action: { action: "click", target: { id: "search_button", description: "Search button", strategies: [{ kind: "role", role: "button" }] } }, result: { success: true, durationMs: 1 }, evidence: [] }],
+    };
+    const artifact = await new CapabilityCompiler().compile(buttonTrace, hints);
+    expect(artifact.steps[0]?.action).toMatchObject({ target: { strategies: [{ kind: "role", role: "button", name: "Search" }] } });
   });
 });
