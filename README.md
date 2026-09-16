@@ -25,7 +25,7 @@ flowchart LR
 
 ## Setup
 
-Use Node 20+ and install dependencies. Tests and runtime use Playwright-managed Chromium by default. Set `PLAYWRIGHT_CHANNEL=chrome` only when explicitly choosing an installed Google Chrome channel.
+Use Node 24+ and install dependencies. Tests and runtime use Playwright-managed Chromium by default. Set `PLAYWRIGHT_CHANNEL=chrome` only when explicitly choosing an installed Google Chrome channel.
 
 ```bash
 npm install
