@@ -13,10 +13,12 @@ function literal(value: RuntimeValue): string {
   return value === null ? "" : String(value);
 }
 
-function compare(observed: string, operator: "equals" | "contains" | "matches", expected: string): boolean {
-  if (operator === "equals") return observed === expected;
-  if (operator === "contains") return observed.includes(expected);
-  return new RegExp(expected).test(observed);
+function compare(observed: string, operator: "equals" | "contains" | "matches", expected: string, caseInsensitive = false): boolean {
+  const actual = observed.replace(/\s+/g, " ").trim();
+  const wanted = expected.replace(/\s+/g, " ").trim();
+  if (operator === "matches") return new RegExp(expected, caseInsensitive ? "i" : "").test(actual);
+  if (operator === "equals") return caseInsensitive ? actual.toLowerCase() === wanted.toLowerCase() : actual === wanted;
+  return caseInsensitive ? actual.toLowerCase().includes(wanted.toLowerCase()) : actual.includes(wanted);
 }
 
 // A string avoids transpiler helper functions leaking into the browser realm.
@@ -156,8 +158,8 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     if (!resolution) return false;
     if (checkpoint.kind === "element_visible") return true;
     const text = (await resolution.locator.innerText()).trim();
-    if (checkpoint.kind === "business_outcome") return text.includes(checkpoint.expected_text);
-    return compare(text, checkpoint.operator, checkpoint.expected);
+    if (checkpoint.kind === "business_outcome") return compare(text, "contains", checkpoint.expected_text, true);
+    return compare(text, checkpoint.operator, checkpoint.expected, true);
   }
 
   async close(): Promise<void> {

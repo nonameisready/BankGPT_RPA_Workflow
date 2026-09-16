@@ -8,6 +8,7 @@
     "demo": "tsx demo/legacy-bank/server.ts",
     "discover": "tsx src/cli/discover.ts",
     "replay": "tsx src/cli/replay.ts",
+    "curate:evidence": "tsx src/cli/curate-evidence.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -1,4 +1,4 @@
-# Draft schema example only. Discovery/compiler/replay are not implemented in round one.
+# Draft schema example. The generated artifact comes from a real discovery trace.
 schema_version: "1.0"
 id: legacybank.get_savings_balance
 version: 1.0.0
@@ -126,23 +126,53 @@ success:
     output: balance
   - kind: output
     output: currency
-business_outcomes:
+terminal_conditions:
   - code: MEMBER_NOT_FOUND
+    status: BUSINESS_OUTCOME
     description: Search produced a known no-member result.
     checkpoint:
-      kind: business_outcome
+      kind: text
       target:
         id: member_not_found_alert
         description: Member not found alert
         strategies:
           - kind: role
             role: alert
-      code: MEMBER_NOT_FOUND
-      expected_text: Member Not Found
+      operator: matches
+      expected: (?:member not found|no member was found)
+      timeout_ms: 300
+  - code: PERMISSION_DENIED
+    status: HARD_FAILURE
+    description: Operator profile cannot access this member.
+    checkpoint:
+      kind: text
+      target:
+        id: permission_denied_alert
+        description: Permission denied alert
+        strategies:
+          - kind: role
+            role: alert
+      operator: matches
+      expected: permission.denied
+      timeout_ms: 300
+  - code: APP_ERROR
+    status: HARD_FAILURE
+    description: Legacy host application error.
+    checkpoint:
+      kind: text
+      target:
+        id: application_error_alert
+        description: Application error alert
+        strategies:
+          - kind: role
+            role: alert
+      operator: matches
+      expected: (?:app.error|application error)
+      timeout_ms: 300
 tenant_overrides: []
 metadata:
   created_at: 2026-09-15T00:00:00.000Z
-  created_by: round-one-example
+  created_by: schema-example
   description_notes:
-    - Illustrates the schema; it has not been compiled or replayed.
+    - Illustrates the schema; the generated artifact is compiled from discovery.
   contains_secrets: false

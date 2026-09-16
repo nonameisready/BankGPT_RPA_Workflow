@@ -9,7 +9,7 @@ export function parseArguments(args: ReadonlyArray<string>): CliArguments {
   for (let index = 0; index < args.length; index++) {
     const key = args[index];
     if (!key?.startsWith("--")) throw new Error(`Unexpected argument: ${key}`);
-    if (key === "--headed") { flags.headed = true; continue; }
+    if (key === "--headed" || key === "--handoff") { flags[key.slice(2)] = true; continue; }
     const value = args[++index];
     if (!value || value.startsWith("--")) throw new Error(`Missing value for ${key}`);
     if (key === "--input") {

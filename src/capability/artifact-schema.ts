@@ -63,6 +63,20 @@ export const BusinessOutcomeSchema = z.object({
   }
 });
 
+export const TerminalConditionSchema = z.object({
+  code: z.string().regex(/^[A-Z][A-Z0-9_]*$/),
+  status: z.enum(["BUSINESS_OUTCOME", "HARD_FAILURE"]),
+  description: z.string().min(1),
+  checkpoint: CheckpointSchema,
+}).strict().superRefine((condition, context) => {
+  if (condition.checkpoint.kind === "output") {
+    context.addIssue({ code: "custom", path: ["checkpoint"], message: "Terminal conditions must observe the application, not a computed output" });
+  }
+  if (condition.checkpoint.kind === "business_outcome" && condition.checkpoint.code !== condition.code) {
+    context.addIssue({ code: "custom", path: ["checkpoint", "code"], message: "Terminal condition code must match checkpoint code" });
+  }
+});
+
 export const TenantOverrideSchema = z.object({
   tenant: z.string().min(1),
   route_prefix: z.string().optional(),
@@ -97,6 +111,7 @@ export const CapabilityArtifactSchema = z.object({
   steps: z.array(CapabilityStepSchema).min(1),
   success: z.array(CheckpointSchema).min(1),
   business_outcomes: z.array(BusinessOutcomeSchema).default([]),
+  terminal_conditions: z.array(TerminalConditionSchema).default([]),
   tenant_overrides: z.array(TenantOverrideSchema).default([]),
   metadata: z.object({
     created_at: z.string().datetime(),
@@ -143,6 +158,7 @@ export const CapabilityArtifactSchema = z.object({
   }
   for (const checkpoint of artifact.success) if ("target" in checkpoint) collectTarget(checkpoint.target);
   for (const outcome of artifact.business_outcomes) if ("target" in outcome.checkpoint) collectTarget(outcome.checkpoint.target);
+  for (const condition of artifact.terminal_conditions) if ("target" in condition.checkpoint) collectTarget(condition.checkpoint.target);
   for (const [index, override] of artifact.tenant_overrides.entries()) {
     for (const [targetId, target] of Object.entries(override.locator_overrides)) {
       if (!reusableTargets.has(targetId) || target.id !== targetId) context.addIssue({ code: "custom", path: ["tenant_overrides", index, "locator_overrides", targetId], message: `Override must address a known target id: ${targetId}` });

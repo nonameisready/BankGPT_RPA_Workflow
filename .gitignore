@@ -2,7 +2,9 @@ node_modules/
 dist/
 coverage/
 .env
-evidence/**/run-*/
+# Routine local runs stay private; selected fake-data evidence under evidence/submission is tracked.
+evidence/discovery/run-*/
+evidence/replay/run-*/
 playwright-report/
 test-results/
 *.log

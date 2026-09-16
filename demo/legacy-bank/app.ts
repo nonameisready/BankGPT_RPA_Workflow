@@ -86,7 +86,7 @@ export function createLegacyBankApp() {
         return;
       }
       case "40400":
-        response.status(404).send(page("Member Not Found", searchForm(`<div class="notice warning" role="alert">Member Not Found: No member was found for ID 40400.</div>`)));
+        response.status(404).send(page("Member Not Found", searchForm(`<div class="notice warning" role="alert">No member was found for ID 40400.</div>`)));
         return;
       case "40300":
         response.status(403).send(page("Permission Denied", `<h1>Permission Denied</h1><div class="notice error" role="alert">PERMISSION_DENIED: Your operator profile cannot access this member.</div><p><a href="/">Return to Member Search</a></p>`));

@@ -1,0 +1,274 @@
+{
+  "traceId": "3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+  "goal": "Look up member 12345 and return the current savings balance and currency",
+  "inputs": {
+    "member_id": "12345"
+  },
+  "steps": [
+    {
+      "id": "discover_1",
+      "observation": {
+        "url": "http://localhost:4000/",
+        "title": "Member Search | LegacyBank Admin Simulator",
+        "visibleText": "LegacyBank Admin Simulator\nTRAINING SYSTEM — FAKE DATA ONLY\n\nMember Search | Help | Operator: demo.user\n\nMember Search\nSearch Criteria\nMember ID\t\tSearch\n\nAuthorized training use only. Try member ID 12345.\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4",
+        "controls": [
+          {
+            "kind": "link",
+            "name": "Member Search"
+          },
+          {
+            "kind": "link",
+            "name": "Help"
+          },
+          {
+            "kind": "input",
+            "name": "",
+            "label": "Member ID",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "kind": "button",
+            "name": "Search",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "dialogs": [],
+        "frames": [],
+        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png"
+      },
+      "action": {
+        "reason": "The member ID input field is visible and ready to be filled with the provided ID 12345.",
+        "action": "fill",
+        "target": {
+          "id": "member_id_field",
+          "description": "Member ID field",
+          "strategies": [
+            {
+              "kind": "label",
+              "value": "Member ID"
+            }
+          ]
+        },
+        "value": {
+          "from_input": "member_id"
+        }
+      },
+      "result": {
+        "success": true,
+        "durationMs": 15,
+        "resolution": {
+          "targetId": "member_id_field",
+          "strategyIndex": 0,
+          "strategyKind": "label"
+        }
+      },
+      "evidence": [
+        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png"
+      ]
+    },
+    {
+      "id": "discover_2",
+      "observation": {
+        "url": "http://localhost:4000/",
+        "title": "Member Search | LegacyBank Admin Simulator",
+        "visibleText": "LegacyBank Admin Simulator\nTRAINING SYSTEM — FAKE DATA ONLY\n\nMember Search | Help | Operator: demo.user\n\nMember Search\nSearch Criteria\nMember ID\t\tSearch\n\nAuthorized training use only. Try member ID 12345.\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4",
+        "controls": [
+          {
+            "kind": "link",
+            "name": "Member Search"
+          },
+          {
+            "kind": "link",
+            "name": "Help"
+          },
+          {
+            "kind": "input",
+            "name": "",
+            "label": "Member ID",
+            "value": "12345",
+            "disabled": false
+          },
+          {
+            "kind": "button",
+            "name": "Search",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "dialogs": [],
+        "frames": [],
+        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png"
+      },
+      "action": {
+        "reason": "The member ID 12345 has been entered and the search button is now ready to be clicked to retrieve the member's savings balance and currency.",
+        "action": "click",
+        "target": {
+          "id": "search_button",
+          "description": "Search button to look up member 12345",
+          "strategies": [
+            {
+              "kind": "role",
+              "role": "button"
+            }
+          ]
+        }
+      },
+      "result": {
+        "success": true,
+        "durationMs": 60,
+        "resolution": {
+          "targetId": "search_button",
+          "strategyIndex": 0,
+          "strategyKind": "role"
+        }
+      },
+      "evidence": [
+        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png"
+      ]
+    },
+    {
+      "id": "discover_3",
+      "observation": {
+        "url": "http://localhost:4000/members/search?member_id=12345",
+        "title": "Member Details | LegacyBank Admin Simulator",
+        "visibleText": "LegacyBank Admin Simulator\nTRAINING SYSTEM — FAKE DATA ONLY\n\nMember Search | Help | Operator: demo.user\n\nMember Details\nMember record loaded.\nMember Profile\nMember ID\t12345\tMember Name\tAvery Example\nService Tier\tStandard\tStatus\tActive\nAccounts\n\nOpen New Sub-Account\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4\n[Frame: Member accounts]\nType\tAccount Number\tCurrent Balance\tCurrency\nSavings\tSAV-000123\t$12,340.22\tUSD\nChecking\tCHK-000124\t$842.17\tUSD",
+        "controls": [
+          {
+            "kind": "link",
+            "name": "Member Search"
+          },
+          {
+            "kind": "link",
+            "name": "Help"
+          },
+          {
+            "kind": "link",
+            "name": "Open New Sub-Account"
+          }
+        ],
+        "dialogs": [],
+        "frames": [
+          {
+            "name": "Member accounts",
+            "url": "http://localhost:4000/members/12345/accounts"
+          }
+        ],
+        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png"
+      },
+      "action": {
+        "reason": "The savings balance is visible in the accounts table within the frame and needs to be extracted.",
+        "action": "extract",
+        "target": {
+          "id": "savings_balance",
+          "description": "Savings account current balance",
+          "strategies": [
+            {
+              "kind": "table_cell",
+              "row_text": "Savings",
+              "column_header": "Current Balance"
+            }
+          ],
+          "frame": "Member accounts"
+        },
+        "output": "balance",
+        "transform": "currency"
+      },
+      "result": {
+        "success": true,
+        "durationMs": 42,
+        "extractedValue": 12340.22,
+        "resolution": {
+          "targetId": "savings_balance",
+          "strategyIndex": 0,
+          "strategyKind": "table_cell"
+        }
+      },
+      "evidence": [
+        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png"
+      ]
+    },
+    {
+      "id": "discover_4",
+      "observation": {
+        "url": "http://localhost:4000/members/search?member_id=12345",
+        "title": "Member Details | LegacyBank Admin Simulator",
+        "visibleText": "LegacyBank Admin Simulator\nTRAINING SYSTEM — FAKE DATA ONLY\n\nMember Search | Help | Operator: demo.user\n\nMember Details\nMember record loaded.\nMember Profile\nMember ID\t12345\tMember Name\tAvery Example\nService Tier\tStandard\tStatus\tActive\nAccounts\n\nOpen New Sub-Account\n\n\nLegacyBank Systems © 2004–2026 · Simulator build 7.4\n[Frame: Member accounts]\nType\tAccount Number\tCurrent Balance\tCurrency\nSavings\tSAV-000123\t$12,340.22\tUSD\nChecking\tCHK-000124\t$842.17\tUSD",
+        "controls": [
+          {
+            "kind": "link",
+            "name": "Member Search"
+          },
+          {
+            "kind": "link",
+            "name": "Help"
+          },
+          {
+            "kind": "link",
+            "name": "Open New Sub-Account"
+          }
+        ],
+        "dialogs": [],
+        "frames": [
+          {
+            "name": "Member accounts",
+            "url": "http://localhost:4000/members/12345/accounts"
+          }
+        ],
+        "screenshotPath": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png"
+      },
+      "action": {
+        "reason": "The savings balance has been extracted; now extract the currency from the same row in the accounts table.",
+        "action": "extract",
+        "target": {
+          "id": "savings_currency",
+          "description": "Savings account currency",
+          "strategies": [
+            {
+              "kind": "table_cell",
+              "row_text": "Savings",
+              "column_header": "Currency"
+            }
+          ],
+          "frame": "Member accounts"
+        },
+        "output": "currency",
+        "transform": "text"
+      },
+      "result": {
+        "success": true,
+        "durationMs": 23,
+        "extractedValue": "USD",
+        "resolution": {
+          "targetId": "savings_currency",
+          "strategyIndex": 0,
+          "strategyKind": "table_cell"
+        }
+      },
+      "evidence": [
+        "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png"
+      ]
+    }
+  ],
+  "result": {
+    "runId": "3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+    "status": "SUCCESS",
+    "code": "BALANCE_CURRENCY_RETRIEVED",
+    "currentStepId": "discover_5",
+    "outputs": {
+      "balance": 12340.22,
+      "currency": "USD"
+    },
+    "evidence": [
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/events.jsonl",
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527464945-observe-1.png",
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527514063-observe-2.png",
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527517149-observe-3.png",
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527520549-observe-4.png",
+      "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f/screenshots/1789527524077-observe-5.png"
+    ]
+  },
+  "startedAt": "2026-09-16T02:57:44.437Z",
+  "finishedAt": "2026-09-16T02:58:47.158Z"
+}

@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-09-16T03:22:32.672Z",
+  "runs": {
+    "discovery": "3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+    "replay-success": "e7eae7f6-b8fe-42f6-9288-cf0cdd68b32c",
+    "replay-business-outcome": "5f1b04f1-0904-4c42-ba53-e6755a338788",
+    "replay-hard-failure-permission": "dc52ed74-7f7a-4af1-b5db-47078120c27e",
+    "replay-hard-failure-app": "efe5c5b2-f74a-4e92-814c-968c3e72ddc4",
+    "handoff": "8e43d342-e656-4431-9b18-26b2fbe18940"
+  },
+  "paths": {
+    "discovery": "evidence/submission/discovery/run-3be3dcd3-9f70-4f57-8d09-76fa7220c88f",
+    "replay-success": "evidence/submission/replay-success/run-e7eae7f6-b8fe-42f6-9288-cf0cdd68b32c",
+    "replay-business-outcome": "evidence/submission/replay-business-outcome/run-5f1b04f1-0904-4c42-ba53-e6755a338788",
+    "replay-hard-failure-permission": "evidence/submission/replay-hard-failure-permission/run-dc52ed74-7f7a-4af1-b5db-47078120c27e",
+    "replay-hard-failure-app": "evidence/submission/replay-hard-failure-app/run-efe5c5b2-f74a-4e92-814c-968c3e72ddc4",
+    "handoff": "evidence/submission/handoff/run-8e43d342-e656-4431-9b18-26b2fbe18940"
+  }
+}

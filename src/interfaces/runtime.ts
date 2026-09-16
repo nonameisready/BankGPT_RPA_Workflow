@@ -4,6 +4,7 @@ import type { PolicyEngine } from "./policy-engine.js";
 import type { RunResult } from "./run-result.js";
 import type { SurfaceAdapter } from "./surface-adapter.js";
 import type { RunTrace } from "./run-trace.js";
+import type { SessionControlManager } from "./session-control.js";
 
 export interface DiscoveryRequest {
   goal: string;
@@ -24,6 +25,8 @@ export interface ReplayRequest {
   surface: SurfaceAdapter;
   policy: PolicyEngine;
   evidence: EvidenceStore;
+  sessionControl?: SessionControlManager;
+  headed?: boolean;
 }
 
 /** Execution-plane interface: intentionally has no LLMProvider dependency. */

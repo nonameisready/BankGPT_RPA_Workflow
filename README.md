@@ -60,7 +60,7 @@ npm run discover -- \
   --input member_id=12345
 ```
 
-Discovery prints a run ID and a generated `capabilities/generated/get-savings-balance-<run-id>.yaml` path. Use that exact path for both replays:
+Discovery prints a run ID and a generated `capabilities/generated/get-savings-balance-<run-id>.yaml` path. Use that same artifact for every replay:
 
 ```bash
 npm run replay -- \
@@ -70,9 +70,23 @@ npm run replay -- \
 npm run replay -- \
   --capability capabilities/generated/get-savings-balance-<run-id>.yaml \
   --input member_id=40400
+
+npm run replay -- \
+  --capability capabilities/generated/get-savings-balance-<run-id>.yaml \
+  --input member_id=40300
+
+npm run replay -- \
+  --capability capabilities/generated/get-savings-balance-<run-id>.yaml \
+  --input member_id=50000
+
+npm run replay -- \
+  --capability capabilities/generated/get-savings-balance-<run-id>.yaml \
+  --input member_id=88888 --handoff
 ```
 
-The first returns `{balance: 12340.22, currency: "USD"}`. The second returns `BUSINESS_OUTCOME / MEMBER_NOT_FOUND`, not a thrown exception. `npm run typecheck` and `npm test` verify the schema and runtime units.
+The results are `SUCCESS` with `{balance: 12340.22, currency: "USD"}`, `BUSINESS_OUTCOME/MEMBER_NOT_FOUND`, `HARD_FAILURE/PERMISSION_DENIED`, and `HARD_FAILURE/APP_ERROR`. The headed `88888` command pauses the same browser session, transfers ownership to the human, waits for Enter after the dialog is handled, re-observes state, and then returns `{balance: 888.88, currency: "USD"}`. It refuses to continue if the operator navigates away during takeover.
+
+`npm run typecheck` checks the TypeScript build. `npm test` includes unit tests and a real Express + Playwright integration suite for all five browser scenarios; the integration tests do not use `MockSurface`.
 
 ## Deterministic demo member IDs
 
@@ -91,14 +105,14 @@ All names and account data are fictional.
 
 `PlaywrightSurfaceAdapter` observes visible text, controls, dialogs, and iframe summaries; the model chooses one validated action at a time. Policy authorizes before execution. Each step creates JSONL events and PNG observations. The `RunTrace` retains raw discovery evidence and is not the reusable artifact.
 
-`CapabilityCompiler` accepts a successful trace plus explicit demo hints for input/output names, output table cells, and the known no-member outcome. It keeps successful actions, substitutes `{from_input: member_id}`, removes the observed invocation value from reusable descriptions, and writes a draft schema-versioned artifact. The [schema example](capabilities/get-savings-balance.example.yaml) shows target IDs, ordered semantic locator strategies, bounded recovery, output checkpoints, and a business-outcome checkpoint. Generated artifacts live under `capabilities/generated/` for human review.
+`CapabilityCompiler` accepts a successful trace plus explicit demo hints for input/output names, output table cells, and declared terminal conditions. It keeps successful actions, substitutes `{from_input: member_id}`, removes the observed invocation value from reusable descriptions, and writes a draft schema-versioned artifact. The [schema example](capabilities/get-savings-balance.example.yaml) shows target IDs, ordered semantic locator strategies, bounded recovery, output checkpoints, and classified terminal conditions. Generated artifacts live under `capabilities/generated/` for human review.
 
-`ReplayEngine` imports no LLM provider and takes only artifact, inputs, surface, policy, and evidence. It resolves inputs, checks policy, executes locators in declared order, checks known outcomes before continuing, verifies output checkpoints, and returns a typed result. The savings value is located by iframe title plus Savings row and Current Balance column—not by `data-field` or test IDs.
+`ReplayEngine` imports no LLM provider. It merges artifact defaults with caller inputs, checks policy, executes locators in declared order, interprets artifact-declared terminal conditions, verifies output checkpoints, and returns a typed result. It contains no LegacyBank-specific error strings. A declared `known_interstitial` is dismissed under policy and the current action is retried only within `max_attempts`. The savings value is located by iframe title plus Savings row and Current Balance column—not by `data-field` or test IDs.
 
 ## Results, evidence, and safety
 
-Run results distinguish `SUCCESS`, `BUSINESS_OUTCOME`, `HARD_FAILURE`, and `HUMAN_REQUIRED`; the `RECOVERABLE` category is reserved for explicit bounded recovery. A failed step cannot silently continue. Replay retries only when its artifact explicitly permits a bounded attempt count. JSONL events and PNG screenshots live in `evidence/{discovery,replay}/run-<id>/`; logs redact secret-like keys and configured sensitive inputs.
+Run results distinguish `SUCCESS`, `BUSINESS_OUTCOME`, `HARD_FAILURE`, and `HUMAN_REQUIRED`; the `RECOVERABLE` category is reserved for explicit bounded recovery. A failed step cannot silently continue. Replay retries only when its artifact explicitly permits a bounded attempt count. Routine JSONL/PNG runs live in ignored `evidence/{discovery,replay}/run-<id>/`. The sanitized fake-data runs selected for review are committed under [evidence/submission](evidence/submission/README.md), with a machine-readable [manifest](evidence/submission/manifest.json). Their references are repository-relative.
 
 Policy code enforces allowed domain, route, action type, and risk behavior in both planes. The demo uses fictional data and the sub-account flow stops at review. No credentials, browser storage state, cookies, or model keys are committed.
 
-Current cuts: `88888` is detected and returns `HUMAN_REQUIRED/UNEXPECTED_DIALOG`, but there is no operator UI or same-session pause/resume yet. No cross-tenant inheritance engine, visual AI locator recovery, or model-assisted replay recovery. The current compiler uses explicit demo output hints rather than pretending fully autonomous inference.
+Current cuts: handoff is a minimal headed-browser + CLI flow, not a multi-user operator console. There is no cross-tenant inheritance runtime, visual AI locator repair, desktop adapter, distributed scheduler, or model-assisted replay recovery. The current compiler uses explicit demo output hints rather than pretending fully autonomous inference.

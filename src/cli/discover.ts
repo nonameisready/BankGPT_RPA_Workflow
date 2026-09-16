@@ -38,7 +38,11 @@ async function main(): Promise<void> {
     risk: "SAFE",
     outputTargets,
     outputTransforms: { balance: "currency", currency: "text" },
-    businessOutcomes: [{ code: "MEMBER_NOT_FOUND", description: "Member search returned a known no-record result.", checkpoint: { kind: "business_outcome", target: { id: "member_not_found_alert", description: "Member not found alert", strategies: [{ kind: "role", role: "alert" }] }, code: "MEMBER_NOT_FOUND", expected_text: "Member Not Found", timeout_ms: 10_000 } }],
+    terminalConditions: [
+      { code: "MEMBER_NOT_FOUND", status: "BUSINESS_OUTCOME", description: "Member search returned a known no-record result.", checkpoint: { kind: "text", target: { id: "member_not_found_alert", description: "Member not found alert", strategies: [{ kind: "role", role: "alert" }] }, operator: "matches", expected: "(?:member not found|no member was found)", timeout_ms: 300 } },
+      { code: "PERMISSION_DENIED", status: "HARD_FAILURE", description: "The operator profile cannot access this member.", checkpoint: { kind: "text", target: { id: "permission_denied_alert", description: "Permission denied alert", strategies: [{ kind: "role", role: "alert" }] }, operator: "matches", expected: "permission.denied", timeout_ms: 300 } },
+      { code: "APP_ERROR", status: "HARD_FAILURE", description: "The legacy host returned an application error.", checkpoint: { kind: "text", target: { id: "application_error_alert", description: "Application error alert", strategies: [{ kind: "role", role: "alert" }] }, operator: "matches", expected: "(?:app.error|application error)", timeout_ms: 300 } },
+    ],
   });
   const artifactDirectory = join(process.cwd(), "capabilities", "generated");
   await mkdir(artifactDirectory, { recursive: true });

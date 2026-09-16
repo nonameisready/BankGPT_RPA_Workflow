@@ -10,4 +10,5 @@ export interface RunResult {
   outputs: Readonly<Record<string, unknown>>;
   evidence: ReadonlyArray<string>;
   debugMessage?: string | undefined;
+  interventionIds?: ReadonlyArray<string>;
 }

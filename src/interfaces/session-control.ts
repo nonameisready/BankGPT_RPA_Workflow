@@ -18,6 +18,7 @@ export interface SessionControlManager {
   owner(sessionId: string): ControlOwner;
   request(sessionId: string, intervention: InterventionRequest): Promise<void>;
   takeControl(sessionId: string): Promise<void>;
+  awaitHumanAction(sessionId: string): Promise<void>;
   resume(sessionId: string): Promise<void>;
   abort(sessionId: string): Promise<void>;
 }

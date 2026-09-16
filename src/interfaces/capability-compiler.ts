@@ -16,6 +16,7 @@ export interface CompilationHints {
   outputTargets?: Readonly<Record<string, Target>>;
   outputTransforms?: Readonly<Record<string, "text" | "number" | "currency" | "boolean">>;
   businessOutcomes?: ReadonlyArray<{ code: string; description: string; checkpoint: Checkpoint }>;
+  terminalConditions?: ReadonlyArray<CapabilityArtifact["terminal_conditions"][number]>;
 }
 
 /** Compiles successful traces, not arbitrary transcripts. */

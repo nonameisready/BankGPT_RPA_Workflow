@@ -84,6 +84,7 @@ export class CapabilityCompiler implements CompilerInterface {
       steps,
       success: hints.outputNames.map((output) => ({ kind: "output", output })),
       business_outcomes: hints.businessOutcomes ?? [],
+      terminal_conditions: hints.terminalConditions ?? [],
       tenant_overrides: [],
       metadata: { created_at: new Date().toISOString(), created_by: "capability-compiler", source_trace_id: trace.traceId, description_notes: [hints.goalCompletion], contains_secrets: false },
     };
